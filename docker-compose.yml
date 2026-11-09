@@ -1,0 +1,25 @@
+services:
+  alpine-vuln:
+    build:
+      context: ./alpine-vuln
+      network: host
+    container_name: sshole-alpine-vuln
+    ports:
+      - "2222:22"
+
+  debian-control:
+    build:
+      context: ./debian-control
+      network: host
+    container_name: sshole-debian-control
+    ports:
+      - "2223:22"
+
+  # Run on demand only (profile "attack"), e.g.:
+  #   docker compose run --rm attacker sshole-alpine-vuln 22 alice 300
+  attacker:
+    profiles: ["attack"]
+    build:
+      context: ./attacker
+      network: host
+    container_name: sshole-attacker

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reporte: Vulnerabilidad *sshole (CVE-2026-123158)</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-2: #273449;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --danger: #f87171;
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --border: #334155;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(135deg, #7f1d1d, #1e293b);
+    padding: 48px 24px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  header .icon { font-size: 56px; }
+  header h1 { margin: 12px 0 8px; font-size: 2rem; }
+  header p { margin: 0; color: var(--muted); }
+  .badges { margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    padding: 6px 14px; border-radius: 999px; font-size: 0.9rem; font-weight: 600;
+    background: var(--panel); border: 1px solid var(--border);
+  }
+  .badge.high { border-color: var(--danger); color: var(--danger); }
+  main { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+  section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+  h2 { margin-top: 0; font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
+  h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--accent); }
+  p, li { color: var(--text); }
+  .muted { color: var(--muted); }
+  code {
+    background: var(--panel-2); padding: 2px 6px; border-radius: 4px;
+    font-family: "JetBrains Mono", Consolas, monospace; font-size: 0.9em;
+  }
+  pre {
+    background: #0b1220; border: 1px solid var(--border); border-radius: 8px;
+    padding: 14px; overflow-x: auto; font-size: 0.9rem;
+  }
+  .steps { list-style: none; padding: 0; counter-reset: step; }
+  .steps li {
+    counter-increment: step; position: relative; padding: 12px 14px 12px 56px;
+    margin-bottom: 10px; background: var(--panel-2); border-radius: 8px;
+  }
+  .steps li::before {
+    content: counter(step); position: absolute; left: 14px; top: 12px;
+    width: 28px; height: 28px; border-radius: 50%; background: var(--accent);
+    color: #0f172a; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .card { background: var(--panel-2); border-radius: 10px; padding: 18px; border-left: 4px solid var(--border); }
+  .card .emoji { font-size: 1.8rem; }
+  .card.ok { border-left-color: var(--ok); }
+  .card.bad { border-left-color: var(--danger); }
+  .card.warn { border-left-color: var(--warn); }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: .04em; }
+  .tag { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; }
+  .tag.ok { background: rgba(74,222,128,.15); color: var(--ok); }
+  .tag.bad { background: rgba(248,113,113,.15); color: var(--danger); }
+  .tag.neutral { background: rgba(148,163,184,.15); color: var(--muted); }
+  .alert {
+    border-left: 4px solid var(--warn); background: rgba(251,191,36,.08);
+    padding: 12px 16px; border-radius: 8px; margin-top: 12px;
+  }
+  .alert.danger { border-left-color: var(--danger); background: rgba(248,113,113,.08); }
+  .alert.info { border-left-color: var(--accent); background: rgba(56,189,248,.08); }
+  ul.check li { margin-bottom: 6px; }
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 24px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="icon">🔓🛡️</div>
+  <h1>Vulnerabilidad *sshole (CVE-2026-123158)</h1>
+  <p>Bypass de autenticación en OpenSSH sshd sobre sistemas con musl libc y sin PAM</p>
+  <div class="badges">
+    <span class="badge high">⚠️ Severidad: Alta (CVSS 3.1: 8.1, NVD)</span>
+    <span class="badge">🐧 Afecta: Alpine, OpenWrt, Buildroot, Yocto</span>
+    <span class="badge">✅ Corregida en OpenSSH 10.6p2</span>
+  </div>
+</header>
+
+<main>
+
+  <section>
+    <h2>📋 Resumen</h2>
+    <p>
+      Una cuenta que no debería aceptar contraseña (por ejemplo, un usuario que solo entra con llave SSH,
+      o <code>root</code> en algunas imágenes de Alpine) puede iniciar sesión por SSH con <strong>cualquier contraseña de entre 257 y 1024 bytes</strong>.
+      No hace falta adivinar nada ni conocer la contraseña real.
+    </p>
+    <div class="alert danger">
+      🚨 <strong>Impacto:</strong> acceso no autenticado a las cuentas afectadas. Si la cuenta afectada es <code>root</code>,
+      el atacante obtiene control total del sistema.
+    </div>
+  </section>
+
+  <section>
+    <h2>🔍 Qué es el problema</h2>
+    <p>
+      El fallo sale de la combinación de dos comportamientos que, por separado, son razonables:
+    </p>
+    <div class="grid">
+      <div class="card warn">
+        <div class="emoji">🔑</div>
+        <h3>1. OpenSSH compara contra el campo guardado</h3>
+        <p>
+          En <code>/etc/shadow</code>, una cuenta sin contraseña tiene <code>*</code> en el campo de hash.
+          Como <code>*</code> no es un hash válido, <code>sshd</code> no tiene nada real con qué comparar.
+          Desde CVE-2016-6210, <code>sshd</code> toma una sal de otra cuenta para que el tiempo de respuesta
+          sea parecido, y compara el resultado de <code>crypt()</code> con el campo guardado.
+        </p>
+      </div>
+      <div class="card bad">
+        <div class="emoji">⚙️</div>
+        <h3>2. musl <code>crypt()</code> devuelve <code>*</code> ante un error</h3>
+        <p>
+          La implementación de SHA-512 crypt de musl rechaza claves de más de <strong>256 bytes</strong>.
+          En ese caso devuelve <code>*</code> en lugar de NULL. Así, una contraseña de 257 a 1024 bytes
+          produce exactamente el mismo valor que el campo de la cuenta bloqueada.
+        </p>
+      </div>
+    </div>
+    <p style="margin-top:16px;">
+      Juntas: <code>crypt()</code> devuelve <code>*</code>, <code>sshd</code> lo compara con el <code>*</code> guardado,
+      y el login se acepta.
+    </p>
+  </section>
+
+  <section>
+    <h2>🧩 Condiciones para ser vulnerable</h2>
+    <p>Un sistema está expuesto solo si se cumplen <strong>todas</strong> estas condiciones:</p>
+    <table>
+      <tr><th>Condición</th><th>Estado requerido</th></tr>
+      <tr><td>🐧 libc del sistema</td><td>musl (Alpine, OpenWrt, Buildroot, Yocto, postmarketOS, Void-musl)</td></tr>
+      <tr><td>🧱 PAM</td><td>No compilado en sshd, o <code>UsePAM no</code></td></tr>
+      <tr><td>🔐 Autenticación por contraseña</td><td><code>PasswordAuthentication yes</code> (es el valor por defecto)</td></tr>
+      <tr><td>🚪 Cuenta objetivo</td><td>Al menos una cuenta con <code>*</code> como campo de contraseña</td></tr>
+      <tr><td>🧂 Cuenta donante</td><td>Al menos una cuenta con un hash real <code>$5$</code> o <code>$6$</code></td></tr>
+      <tr><td>📦 Versión de OpenSSH</td><td>Sin el parche (anterior a 10.6p2, o paquete sin backport)</td></tr>
+    </table>
+    <div class="alert info">
+      💡 glibc, PAM, <code>PasswordAuthentication no</code>, OpenBSD, FreeBSD y macOS no están afectados.
+    </div>
+  </section>
+
+  <section>
+    <h2>🔬 Cadena de explotación</h2>
+    <ol class="steps">
+      <li>El atacante abre una conexión SSH y responde la primera contraseña con un valor cualquiera (falla).</li>
+      <li>Para la cuenta con <code>*</code>, <code>sshd</code> no tiene hash real y usa <code>pick_salt()</code> para tomar una sal de un hash válido.</li>
+      <li>En el segundo intento envía una contraseña de 300 bytes.</li>
+      <li>musl <code>crypt()</code> rechaza la clave por tamaño y devuelve <code>*</code>.</li>
+      <li><code>sshd</code> compara <code>*</code> con el campo <code>*</code> de la cuenta, coinciden, y el login se acepta.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>🧪 Resultados del laboratorio</h2>
+    <p class="muted">
+      Laboratorio Docker en <code>sshole-lab/</code>. El contenedor vulnerable compila OpenSSH 9.3p2 sin parche
+      sobre Alpine 3.18 (musl). El control usa Debian 12 (glibc con PAM). Ambos tienen la cuenta <code>alice</code> con <code>*</code>.
+    </p>
+    <table>
+      <tr><th>Prueba</th><th>Objetivo</th><th>Contraseña</th><th>Resultado</th></tr>
+      <tr>
+        <td>🔎 check.sh</td><td>Alpine (vulnerable)</td><td>—</td>
+        <td><span class="tag bad">❗ EXPUESTO</span></td>
+      </tr>
+      <tr>
+        <td>🔎 check.sh</td><td>Debian (control)</td><td>—</td>
+        <td><span class="tag ok">✅ No expuesto (no es musl)</span></td>
+      </tr>
+      <tr>
+        <td>🔐 Login alice</td><td>Alpine (vulnerable)</td><td>256 bytes</td>
+        <td><span class="tag neutral">Rechazado</span></td>
+      </tr>
+      <tr>
+        <td>🔓 Login alice</td><td>Alpine (vulnerable)</td><td>300 bytes</td>
+        <td><span class="tag bad">❗ ACEPTADO (uid=1000)</span></td>
+      </tr>
+      <tr>
+        <td>🔐 Login alice</td><td>Debian (control)</td><td>300 bytes</td>
+        <td><span class="tag ok">✅ Rechazado</span></td>
+      </tr>
+    </table>
+    <p class="muted" style="margin-top:12px;">
+      El límite exacto se confirma: 256 bytes no alcanza el límite de musl, y 300 bytes sí lo supera.
+    </p>
+  </section>
+
+  <section>
+    <h2>🛠️ Mitigación</h2>
+    <div class="grid">
+      <div class="card ok">
+        <div class="emoji">⬆️</div>
+        <h3>Actualizar</h3>
+        <p>Actualizar OpenSSH a <strong>10.6p2</strong> o posterior. En Alpine: <code>apk upgrade openssh</code>.</p>
+        <p class="muted">Reiniciar <code>sshd</code> después. Un proceso ya en ejecución sigue con el código anterior.</p>
+      </div>
+      <div class="card warn">
+        <div class="emoji">🚫</div>
+        <h3>Desactivar contraseñas</h3>
+        <p>Si no puedes actualizar todavía:</p>
+        <pre>PasswordAuthentication no</pre>
+        <p class="muted">Luego reinicia el servicio.</p>
+      </div>
+      <div class="card">
+        <div class="emoji">🔎</div>
+        <h3>Verificar</h3>
+        <p>Ejecuta el <code>check.sh</code> oficial como root en cada equipo:</p>
+        <pre>sh check.sh</pre>
+        <p class="muted">Código 0 = expuesto, 1 = no expuesto, 2 = no se pudo determinar.</p>
+      </div>
+    </div>
+    <h3 style="margin-top:20px;">🧾 Revisar si hubo accesos</h3>
+    <ul class="check">
+      <li>🔍 Busca inicios de sesión exitosos de cuentas sin contraseña en los logs de <code>sshd</code>.</li>
+      <li>👤 Revisa <code>/etc/shadow</code> para cuentas con <code>*</code> y su última actividad.</li>
+      <li>🧰 Comprueba cambios recientes en <code>authorized_keys</code>, cron y usuarios nuevos.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>📚 Referencias</h2>
+    <ul>
+      <li>🌐 <a href="https://sshhole.com">sshhole.com</a>: análisis del descubridor (Özgün Kültekin).</li>
+      <li>💻 <a href="https://github.com/oz9un/sshole">github.com/oz9un/sshole</a>: PoC original y <code>check.sh</code>.</li>
+      <li>📜 CVE-2016-6210: enumeración de usuarios en sshd, origen de <code>pick_salt()</code>.</li>
+      <li>🏛️ <a href="https://nvd.nist.gov/vuln/detail/CVE-2026-123158">NVD: CVE-2026-123158</a> (consultado el 8 de noviembre de 2026).</li>
+      <li>🧩 Corrección upstream: <a href="https://github.com/openssh/openssh-portable/commit/4353fdc43ef646c43a8dda7025cc1a898caf1482">commit 4353fdc</a> en OpenSSH.</li>
+      <li>📢 <a href="https://www.openssh.org/releasenotes.html#10.6p2">Notas de OpenSSH 10.6p2</a> y <a href="https://alpinelinux.org/posts/2026-11-05-openssh-password-authentication-bypass/">aviso de Alpine Linux</a>.</li>
+    </ul>
+    <div class="alert info">
+      🔎 <strong>Verificado en NVD:</strong> el CVE existe, fue publicado el 5 de noviembre de 2026 y tiene CVSS 3.1 8.1 (HIGH)
+      con vector <code>AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H</code>. La puntuación viene de MITRE como fuente secundaria.
+      El estado es "Received", así que NVD todavía no ha publicado su análisis. CWE-394. CISA SSVC marca explotación "PoC" y no automatizable.
+    </div>
+    <div class="alert">
+      ⚠️ <strong>Diferencia con NVD:</strong> NVD describe el rango de contraseñas como 256 a 1024 caracteres. Este reporte dice 257 a 1024,
+      porque en el código de musl las claves de más de 256 bytes son las que fallan. En el laboratorio, 256 se rechaza y 300 se acepta.
+      NVD también nombra solo Alpine como ejemplo de plataforma. OpenWrt, Buildroot y Yocto vienen de sshhole.com.
+    </div>
+    <p class="muted">
+      Cifras y fechas tomadas de fuentes públicas y de NVD.
+    </p>
+  </section>
+
+  <section>
+    <h2>⚖️ Uso responsable</h2>
+    <p>
+      Este reporte acompaña un laboratorio local para investigación y defensa en sistemas propios.
+      Las contraseñas de prueba son ficticias. No reutilices el laboratorio contra equipos de terceros sin autorización.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  Reporte generado a partir del laboratorio <code>sshole-lab</code> · Noviembre 2026
+</footer>
+
+</body>
+</html>
