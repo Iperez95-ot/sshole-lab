@@ -1,4 +1,6 @@
+# Docker Compose file for sshole-lab
 services:
+  # Builds the vulnerable Alpine Linux container and exposes SSH on port 2222, this one will be used as the target for the attack
   alpine-vuln:
     build:
       context: ./alpine-vuln
@@ -7,6 +9,7 @@ services:
     ports:
       - "2222:22"
 
+  # Builds the Debian control container and exposes SSH on port 2223, this one will be used to control the vulnerable container
   debian-control:
     build:
       context: ./debian-control
@@ -15,8 +18,7 @@ services:
     ports:
       - "2223:22"
 
-  # Run on demand only (profile "attack"), e.g.:
-  #   docker compose run --rm attacker sshole-alpine-vuln 22 alice 300
+  # Builds the attacker container, the one will be used to attack the vulnerable container
   attacker:
     profiles: ["attack"]
     build:

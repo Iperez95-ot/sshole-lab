@@ -7,14 +7,19 @@
 #include <shadow.h>
 #include <unistd.h>
 
+// Defines a function that retrieves the shadow password entry for a given username. If the entry is found, 
+// it returns the password field; otherwise, it returns an empty string.
 static const char *shadow_pw(const char *name) {
     struct spwd *sp = getspnam(name);
     if (sp) return sp->sp_pwdp;
     return "";
 }
 
+// Defines a static buffer to hold the salt value used for password hashing.
 static char salt_buf[32];
 
+// Defines a function that selects an appropriate salt for password hashing. It retrieves the root user's shadow password entry 
+// and extracts the salt prefix from it. If the shadow entry is not in the expected format, it falls back to using "xx" (DES) as the salt.
 static const char *pick_salt(void) {
     struct passwd *pw;
     const char *passwd;
@@ -39,6 +44,7 @@ static const char *pick_salt(void) {
     return salt_buf;
 }
 
+// Defines a function that intercepts calls to the crypt() function, logs the key length and salt used, and then calls the real crypt() function.
 int main(int argc, char **argv) {
     const char *user = argc > 1 ? argv[1] : "alice";
     const char *password = argc > 2 ? argv[2] : "AAAA";

@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
+// Defines a function that intercepts calls to the crypt() function, logs the key length and salt used, and then calls the real crypt() function. 
+// It also logs the result of the crypt() call.
 char *crypt(const char *key, const char *salt) {
     static char *(*real_crypt)(const char *, const char *) = NULL;
     if (!real_crypt)
@@ -30,6 +32,8 @@ char *crypt(const char *key, const char *salt) {
     return result;
 }
 
+// Defines a function that intercepts calls to the strcmp() function, logs the strings being compared and the result of the comparison, 
+// and then calls the real strcmp() function.
 int strcmp(const char *a, const char *b) {
     static int (*real_strcmp)(const char *, const char *) = NULL;
     if (!real_strcmp)
