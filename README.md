@@ -43,9 +43,9 @@ sshole-lab/
 │   └── Dockerfile            # Debian 12-slim + openssh-server (glibc, PAM)
 ├── attacker/
 │   ├── Dockerfile            # Alpine + python3 + paramiko
-│   ├── attack.py            # PoC: one connection, two password attempts
-│   ├── crypt_spy.c          # Diagnostics: LD_PRELOAD shim that logs crypt()/strcmp() calls
-│   └── test_picksalt.c      # Diagnostics: reproduces pick_salt() + crypt() outside sshd
+│   ├── attack.py             # PoC: one connection, two password attempts
+│   ├── crypt_spy.c           # Diagnostics: LD_PRELOAD shim that logs crypt()/strcmp() calls
+│   └── test_picksalt.c       # Diagnostics: reproduces pick_salt() + crypt() outside sshd
 ```
 
 The two `.c` files in `attacker/` are diagnostic tools I used to investigate the internal behavior. They are not part of the reproduction.
